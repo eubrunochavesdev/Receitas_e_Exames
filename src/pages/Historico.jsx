@@ -49,8 +49,10 @@ const Historico = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Histórico de Receituários</h2>
+    <div className="container mt-5"
+    style={{ backgroundColor: "var(--primary-color)", padding: "20px", borderRadius: "10px" }}>
+      <h2 className="mb-4"
+      style={{ color: "white" }}>Histórico de Receituários</h2>
       {historico.length === 0 ? (
         <p>Nenhum receituário emitido ainda.</p>
       ) : (
