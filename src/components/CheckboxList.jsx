@@ -2,16 +2,16 @@ import React from "react";
 
 const CheckboxList = ({ exames, selecionados, toggleSelecionado }) => {
   return (
-    <div className="form-check form-check-inline flex-column">
+    <div className="d-flex flex-column">
       {exames.map((exame, index) => (
-        <div key={index} className="form-check">
+        <div key={index} className="d-flex align-items-center mb-2">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-checkbox" // Classe personalizada para o checkbox
             checked={selecionados.includes(exame)}
             onChange={() => toggleSelecionado(exame)}
           />
-          <label className="form-check-label">{exame}</label>
+          <label className="checkbox-label">{exame}</label> {/* Classe personalizada para o texto */}
         </div>
       ))}
     </div>

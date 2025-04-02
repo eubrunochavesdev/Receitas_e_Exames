@@ -45,31 +45,38 @@ const ReceitaExames = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row">
-        <div className="col-md-6 mx-auto">
-          <h2 className="mb-4">Receita de Exames</h2>
-          <div className="form-group mb-4">
-            <label>Nome do Paciente</label>
-            <input
-              type="text"
-              className="form-control"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
+    <div className="vh-100 d-flex justify-content-center align-items-center">
+      <div className="container bg-light p-5 rounded shadow">
+        <div className="row">
+          <div className="col-md-6 mx-auto">
+            <h2
+              className="mb-4"
+              style={{ fontFamily: "var(--font-bold)", color: "var(--primary-color)" }}
+            >
+              Receituário 5s
+            </h2>
+            <div className="form-group mb-4">
+              <label className="fw-bold">Nome do Paciente</label>
+              <input
+                type="text"
+                className="form-control"
+                style={{ fontFamily: "var(--font-regular)" }}
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+              />
+            </div>
+            <CheckboxList
+              exames={exames}
+              selecionados={examesSelecionados}
+              toggleSelecionado={toggleSelecionado}
             />
+            <button
+              onClick={handleDownload}
+              className="btn btn-primary mt-4 w-100"
+            >
+              Gerar Receita em PDF
+            </button>
           </div>
-          <CheckboxList
-            exames={exames}
-            selecionados={examesSelecionados}
-            toggleSelecionado={toggleSelecionado}
-          />
-
-          <button
-            onClick={handleDownload}
-            className="btn btn-primary mt-4 w-100"
-          >
-            Gerar Receita em PDF
-          </button>
         </div>
       </div>
     </div>
