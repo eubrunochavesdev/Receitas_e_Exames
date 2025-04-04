@@ -99,11 +99,6 @@ const App = () => {
         ) : (
           // Tela de Login
           <Routes>
-            <Route path="*" element={<Login onLogin={setUsuarioLogado} />} />
-          </Routes>
-        )}
-        {!usuarioLogado && (
-          <Routes>
             <Route
               path="*"
               element={
