@@ -3,11 +3,16 @@ import CheckboxList from "../components/CheckboxList";
 import { jsPDF } from "jspdf";
 import { useNavigate } from "react-router-dom";
 import assinatura from "../assets/assinatura.png"; // Importando a assinatura diretamente
+import CustomPopup from "../components/CustomPopup";
+import { BadgeCheck } from "lucide-react";
+import axios from "axios";
 
 const ReceitaExames = ({ usuarioLogado }) => {
   const [nome, setNome] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
   const [examesSelecionados, setExamesSelecionados] = useState([]);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
 
   const exames = [
@@ -33,7 +38,8 @@ const ReceitaExames = ({ usuarioLogado }) => {
 
   const handleDownload = () => {
     if (!nome || !dataNascimento || examesSelecionados.length === 0) {
-      alert("Por favor, preencha todos os campos antes de gerar o PDF.");
+      setPopupMessage("Por favor, preencha todos os campos antes de gerar o PDF."); // Altere esta mensagem
+      setShowPopup(true);
       return;
     }
 
@@ -67,9 +73,10 @@ const ReceitaExames = ({ usuarioLogado }) => {
     return `${dia}/${mes}/${ano}`;
   };
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!nome || !dataNascimento || examesSelecionados.length === 0) {
-      alert("Por favor, preencha todos os campos antes de salvar.");
+      setPopupMessage("Por favor, preencha todos os campos antes de salvar."); // Altere esta mensagem
+      setShowPopup(true);
       return;
     }
 
@@ -81,71 +88,87 @@ const ReceitaExames = ({ usuarioLogado }) => {
       data: new Date().toLocaleString(),
     };
 
-    const historico = JSON.parse(localStorage.getItem("historicoReceitas")) || [];
-    historico.push(receita);
-    localStorage.setItem("historicoReceitas", JSON.stringify(historico));
-
-    alert("Receita salva com sucesso!");
-    handleDownload();
+    try {
+      await axios.post("http://localhost:3000/receitas", receita);
+      setPopupMessage(
+        <div>
+          <BadgeCheck size={64} style={{ color: "var(--primary-color)" }} /> {/* Aumente o tamanho aqui */}
+          <p>Receita salva com sucesso!</p>
+        </div>
+      );
+      setShowPopup(true);
+      handleDownload();
+    } catch (error) {
+      console.error("Erro ao salvar receita:", error);
+      setPopupMessage("Erro ao salvar receita.");
+      setShowPopup(true);
+    }
   };
 
   return (
-    <div className="vh-100 d-flex justify-content-center align-items-center">
-      <div className="container bg-light p-5 rounded shadow">
-        <div className="row">
-          <div className="col-md-6 mx-auto">
-            {/* Botão de voltar (somente para admin) */}
-            {usuarioLogado?.tipo === "admin" && (
-              <button
-                className="btn btn-outline-primary mb-3"
-                onClick={() => navigate("/admin-dashboard")}
+    <>
+      <CustomPopup
+        show={showPopup}
+        message={popupMessage}
+        onClose={() => setShowPopup(false)}
+      />
+      <div className="vh-100 d-flex justify-content-center align-items-center">
+        <div className="container bg-light p-5 rounded shadow">
+          <div className="row">
+            <div className="col-md-6 mx-auto">
+              {/* Botão de voltar (somente para admin) */}
+              {usuarioLogado?.tipo === "admin" && (
+                <button
+                  className="btn btn-outline-primary mb-3"
+                  onClick={() => navigate("/admin-dashboard")}
+                >
+                  ← Voltar
+                </button>
+              )}
+
+              <h2
+                className="mb-4"
+                style={{ fontFamily: "var(--font-bold)", color: "var(--primary-color)" }}
               >
-                ← Voltar
+                Receituário 5s
+              </h2>
+
+              <div className="form-group mb-4">
+                <label className="fw-bold">Nome do Paciente</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  style={{ fontFamily: "var(--font-regular)" }}
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group mb-4">
+                <label className="fw-bold">Data de Nascimento</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  style={{ fontFamily: "var(--font-regular)" }}
+                  value={dataNascimento}
+                  onChange={(e) => setDataNascimento(e.target.value)}
+                />
+              </div>
+
+              <CheckboxList
+                exames={exames}
+                selecionados={examesSelecionados}
+                toggleSelecionado={toggleSelecionado}
+              />
+
+              <button className="btn btn-secondary mt-2 w-100" onClick={handleSalvar}>
+                Salvar Receita
               </button>
-            )}
-
-            <h2
-              className="mb-4"
-              style={{ fontFamily: "var(--font-bold)", color: "var(--primary-color)" }}
-            >
-              Receituário 5s
-            </h2>
-
-            <div className="form-group mb-4">
-              <label className="fw-bold">Nome do Paciente</label>
-              <input
-                type="text"
-                className="form-control"
-                style={{ fontFamily: "var(--font-regular)" }}
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-              />
             </div>
-
-            <div className="form-group mb-4">
-              <label className="fw-bold">Data de Nascimento</label>
-              <input
-                type="date"
-                className="form-control"
-                style={{ fontFamily: "var(--font-regular)" }}
-                value={dataNascimento}
-                onChange={(e) => setDataNascimento(e.target.value)}
-              />
-            </div>
-
-            <CheckboxList
-              exames={exames}
-              selecionados={examesSelecionados}
-              toggleSelecionado={toggleSelecionado}
-            />
-
-            <button className="btn btn-secondary mt-2 w-100" onClick={handleSalvar}>
-              Salvar Receita
-            </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

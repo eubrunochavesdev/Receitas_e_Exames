@@ -11,6 +11,7 @@ import Historico from "./pages/Historico";
 import AdminPanel from "./pages/AdminPanel";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
+import RedefinirSenha from "./pages/RedefinirSenha";
 import "./global.css";
 
 const App = () => {
@@ -18,6 +19,9 @@ const App = () => {
 
   const handleLogout = () => {
     setUsuarioLogado(null); // Limpa o estado do usuário logado
+    localStorage.removeItem("token"); // Remove o token do localStorage
+    localStorage.removeItem("email");
+    localStorage.removeItem("tipo");
   };
 
   return (
@@ -29,7 +33,7 @@ const App = () => {
             <>
               <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="container">
-                  <Link className="navbar-brand" to="/">
+                  <Link className="navbar-brand" to="/admin-dashboard">
                     Painel do Administrador
                   </Link>
                   <div className="collapse navbar-collapse justify-content-end">
@@ -40,16 +44,11 @@ const App = () => {
                 </div>
               </nav>
               <Routes>
-                <Route path="/" element={<AdminDashboard />} />{" "}
-                {/* Dashboard com os botões */}
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                <Route path="/admin-panel" element={<AdminPanel />} />{" "}
-                {/* Relatórios */}
-                <Route
-                  path="/receita-exames"
-                  element={<ReceitaExames usuarioLogado={usuarioLogado} />} // Receitas
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/admin-panel" element={<AdminPanel />} />
+                <Route path="/historico" element={<Historico usuarioLogado={usuarioLogado} />} />
+                <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+                <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
               </Routes>
             </>
           ) : (
@@ -57,22 +56,10 @@ const App = () => {
             <>
               <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="container">
-                  <Link className="navbar-brand" to="/">
+                  <Link className="navbar-brand" to="/receita-exames">
                     Receituário
                   </Link>
-                  <div className="collapse navbar-collapse">
-                    <ul className="navbar-nav me-auto">
-                      <li className="nav-item">
-                        <Link className="btn btn-primary me-2" to="/">
-                          Novo Receituário
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link className="btn btn-success me-2" to="/historico">
-                          Histórico
-                        </Link>
-                      </li>
-                    </ul>
+                  <div className="collapse navbar-collapse justify-content-end">
                     <button className="btn btn-danger" onClick={handleLogout}>
                       Sair
                     </button>
@@ -80,19 +67,10 @@ const App = () => {
                 </div>
               </nav>
               <Routes>
-                <Route
-                  path="/"
-                  element={<ReceitaExames usuarioLogado={usuarioLogado} />}
-                />
-                <Route
-                  path="/historico"
-                  element={<Historico usuarioLogado={usuarioLogado} />}
-                />
-                <Route
-                  path="/receita-exames"
-                  element={<ReceitaExames usuarioLogado={usuarioLogado} />}
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/receita-exames" element={<ReceitaExames />} />
+                <Route path="/historico" element={<Historico usuarioLogado={usuarioLogado} />} />
+                <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+                <Route path="*" element={<Navigate to="/receita-exames" replace />} />
               </Routes>
             </>
           )

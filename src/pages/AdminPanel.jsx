@@ -3,7 +3,7 @@ import { jsPDF } from "jspdf";
 import papelTimbrado from "../assets/papel_timbrado.jpg";
 import { useNavigate } from "react-router-dom";
 
-const AdminPanel = () => {
+const AdminPanel = ({ usuarioLogado }) => {
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [historico, setHistorico] = useState([]);
@@ -11,6 +11,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     const usuariosCadastrados = [
+      { id: 1, nome: "Admin", email: "admin@admin.com", tipo: "admin" }, // Adiciona o admin à lista
       { id: 2, nome: "Clínica A", email: "clinicaA@exemplo.com", tipo: "clinica" },
       { id: 3, nome: "Clínica B", email: "clinicaB@exemplo.com", tipo: "clinica" },
     ];
@@ -58,7 +59,7 @@ const AdminPanel = () => {
       doc.text(`Data da Receita: ${formatarData(receita.data)}`, 15, yPosition + 20);
     });
 
-    doc.save(`Historico_Clinica_${clinica?.nome.replace(/\s+/g, "_") || clinicaId}.pdf`);
+    doc.save(`Historico_${clinica?.nome.replace(/\s+/g, "_") || clinicaId}.pdf`);
   };
 
   const formatarData = (data) => {
@@ -117,7 +118,7 @@ const AdminPanel = () => {
                   <button
                     className="btn btn-primary"
                     onClick={() => handleDownloadHistorico(usuario.id)}
-                    aria-label={`Baixar histórico da ${usuario.nome}`}
+                    aria-label={`Baixar histórico de ${usuario.nome}`}
                   >
                     Baixar Histórico
                   </button>

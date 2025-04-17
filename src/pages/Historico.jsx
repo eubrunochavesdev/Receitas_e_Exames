@@ -1,16 +1,37 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { jsPDF } from "jspdf";
+import { useNavigate } from "react-router-dom";
 
 const Historico = ({ usuarioLogado }) => {
-  const [historico, setHistorico] = useState([]);
+  const [receitas, setReceitas] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Recupera o histórico do localStorage
-    const todasReceitas = JSON.parse(localStorage.getItem("historicoReceitas")) || [];
-    // Filtra as receitas do usuário logado
-    const receitasDoUsuario = todasReceitas.filter((receita) => receita.usuarioId === usuarioLogado.id);
-    setHistorico(receitasDoUsuario);
+    const fetchReceitas = async () => {
+      try {
+        console.log("Usuário logado:", usuarioLogado);
+        const response = await axios.get("http://localhost:3000/api/receitas"); // Atualiza a URL para incluir o prefixo /api
+        console.log("Receitas carregadas:", response.data);
+
+        // Filtra receitas pelo ID do usuário logado
+        const receitasFiltradas = response.data.filter(
+          (receita) => receita.usuarioId === usuarioLogado.id
+        );
+        setReceitas(receitasFiltradas);
+      } catch (error) {
+        console.error("Erro ao carregar receitas:", error);
+      }
+    };
+
+    if (usuarioLogado) {
+      fetchReceitas();
+    }
   }, [usuarioLogado]);
+
+  if (!usuarioLogado) {
+    return <p>Carregando informações do usuário...</p>;
+  }
 
   // Função para formatar a data no formato dd/mm/aaaa
   const formatarData = (data) => {
@@ -44,12 +65,20 @@ const Historico = ({ usuarioLogado }) => {
 
   return (
     <div className="container mt-5">
+      {/* Botão de voltar */}
+      <button
+        className="btn btn-outline-primary mb-4"
+        onClick={() => navigate("/admin-dashboard")}
+      >
+        ← Voltar
+      </button>
+
       <h2 className="mb-4">Histórico de Receitas</h2>
-      {historico.length === 0 ? (
+      {receitas.length === 0 ? (
         <p>Nenhuma receita encontrada.</p>
       ) : (
         <ul className="list-group">
-          {historico.map((receita, index) => (
+          {receitas.map((receita, index) => (
             <li key={index} className="list-group-item">
               <h5>Paciente: {receita.nomePaciente}</h5>
               <p><strong>Data de Nascimento:</strong> {formatarData(receita.dataNascimento)}</p>
